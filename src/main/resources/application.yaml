@@ -1,0 +1,168 @@
+#Grouping Sources
+spring:
+  profiles:
+    group:
+      "prod": "cotae-base, prod-gateway-setups, prod-gateway-security, gateway-routes"
+      "dev": "cotae-base, prod-gateway-setups, dev-gateway-security, gateway-routes"
+      "local": "cotae-base, local-gateway-setups, local-gateway-security, gateway-routes"
+    active: local
+---
+# Cotae Gateway
+server:
+  port: 80
+
+logging:
+  file:
+    name: cotae-gateway.log
+  level:
+    reactor:
+      netty: DEBUG
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
+
+spring:
+  config:
+    activate:
+      on-profile: cotae-base
+  #Swagger configurations
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  #Dev tools Endpoints
+  devtools:
+    restart:
+      exclude: static/**, public/**, resources/**
+
+#Actuator
+management:
+  endpoint:
+    #    logfile:
+    #      external-file: ~/logback.log
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+  trace:
+    http:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,threaddump,conditions,info,heapdump,gateway,refresh
+      base-path: /gateway/actuator
+      path-mapping:
+        loggers: logs
+        httptrace: trace
+info:
+  spring:
+    framework:
+      version: ${spring-framework.version}
+  java:
+    version: ${java.version}
+---
+spring:
+  config:
+    activate:
+      on-profile: local-gateway-setups
+  cloud:
+    gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Cotae Global Gateway Filters
+            preLogger: true
+            postLogger: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allow-credentials: false
+            allowedHeaders: '*'
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
+              - PATCH
+      httpclient: #Http Client timeout
+        connect-timeout: 2000
+        response-timeout: 10s
+---
+spring:
+  config:
+    activate:
+      on-profile: prod-gateway-setups
+  cloud:
+    gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Cotae Global Gateway Filters
+            preLogger: true
+            postLogger: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: ${COTAE_ORIGIN_URLS}
+            allow-credentials: true
+            allowedHeaders: '*'
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
+              - PATCH
+      httpclient: #Http Client timeout
+        connect-timeout: 2000
+        response-timeout: 10s
+---
+spring:
+  config:
+    activate:
+      on-profile: gateway-routes
+  cloud:
+    gateway:
+      routes:
+        - id: User-Auths # This filters not use Auth filters. Login/Register
+          uri: http://localhost:8080
+          predicates:
+            - Path=/user-svc/auth/**
+            - Method=POST, GET
+          filters:
+            - RewritePath=/user-svc/auth/(?<segment>.*),/api/user/auth/$\{segment}
+        - id: User-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/user-svc/**
+          filters:
+            - JwtAuthenticationFilter # Need Authentication.
+            - RewritePath=/user-svc/(?<segment>.*),/api/user/$\{segment}
+---
+spring:
+  config:
+    activate:
+      on-profile: local-gateway-security
+
+token:
+  access-expired-time: 200000
+  refresh-expired-time: 2000000
+  refresh-token-name: refresh-token
+  access-token-name: access-token
+  secret: $2a$12$/v.L6rSAE2zH15M8zXMl.efQppOP50kunATCeevsZeCw6vU.6x4fS # thisistesttoken
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod-gateway-security
+
+token:
+  access-expired-time: ${access-expired-timeout}
+  refresh-expired-time: ${refresh-expired-timeout}
+  refresh-token-name: ${refresh-token-name}
+  access-token-name: ${access-token-name}
+  secret: ${gateway-secret}
