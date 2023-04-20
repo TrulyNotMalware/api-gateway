@@ -4,8 +4,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = 'com.agilesoda'
-version = '2.2-SNAPSHOT'
+group = 'com.devplt'
+version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {

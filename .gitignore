@@ -38,3 +38,6 @@ out/
 
 ### LOG ###
 cotae-gateway.log*
+
+### Config impl ###
+src/main/resources/application-devplt.yaml
