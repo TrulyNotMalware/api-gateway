@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: devplatform-gateway
+  name: devplatform-gateway
+  namespace: dev-platform
+spec:
+  selector:
+    app: devplatform-gateway
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 32324
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+      nodePort: 32382
+  type: NodePort

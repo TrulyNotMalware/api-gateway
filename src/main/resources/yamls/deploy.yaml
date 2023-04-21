@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devplatform-gateway
+  namespace: dev-platform
+  labels:
+    app: devplatform-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devplatform-gateway
+  template:
+    metadata:
+      labels:
+        app: devplatform-gateway
+    spec:
+      containers:
+        - name: devplatform-gateway
+          image: devplt.registry.io/test_project/api-gateway:0.0.1-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GATEWAY_PORT
+              value: "80"
+            - name: USER_SVC
+              valueFrom:
+                secretKeyRef:
+                  name: devplatform-gateway-secret
+                  key: USER_SVC
+            - name: USER_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: devplatform-gateway-secret
+                  key: USER_PORT
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                secretKeyRef:
+                  name: devplatform-gateway-secret
+                  key: GATEWAY_PROFILES
+          ports:
+            - name: http
+              containerPort: 80
