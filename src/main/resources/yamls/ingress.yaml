@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devplatform-gateway
+  namespace: dev-platform
+  labels:
+    app: devplatform-gateway
+spec:
+  rules:
+    - host: trulynotmalware.dev
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/apiservice"
+            backend:
+              service:
+                name: devplatform-gateway
+                port:
+                  number: 80

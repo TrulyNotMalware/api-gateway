@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: devplatform-gateway
-          image: devplt.registry.io/test_project/api-gateway:0.0.1-SNAPSHOT
+          image: harbor.registry.notypie.dev/test_project/api-gateway:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: GATEWAY_PORT
