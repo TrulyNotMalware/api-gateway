@@ -32,11 +32,6 @@ spec:
                 secretKeyRef:
                   name: devplatform-gateway-secret
                   key: USER_PORT
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                secretKeyRef:
-                  name: devplatform-gateway-secret
-                  key: GATEWAY_PROFILES
           ports:
             - name: http
               containerPort: 80

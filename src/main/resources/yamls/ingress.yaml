@@ -5,13 +5,16 @@ metadata:
   namespace: dev-platform
   labels:
     app: devplatform-gateway
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-    - host: trulynotmalware.dev
+    - host: notypie.dev
       http:
         paths:
           - pathType: Prefix
-            path: "/apiservice"
+            path: /apiservice(/|$)(.*)
             backend:
               service:
                 name: devplatform-gateway
