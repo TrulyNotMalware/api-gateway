@@ -21,5 +21,5 @@ ENV PROFILE = ${ACTIVE_PROFILE}
 COPY --from=builder /build/libs/$JAR_FILE_NAME.jar /app.jar
 #COPY build/libs/*.jar app.jar
 ENV JAVA_OPTS=""
-EXPOSE $SERVER_PORT
+EXPOSE ${GATEWAY_SERVER_PORT}
 ENTRYPOINT exec java -jar -Dspring.profiles.active=${PROFILE} -Dspring.config.location=classpath:/${CONFIG_PATH} /app.jar
